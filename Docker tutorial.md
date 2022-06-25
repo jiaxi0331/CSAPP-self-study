@@ -42,6 +42,24 @@ $ docker run -dp 3000:3000 getting-started
 
 Remember the -d and -p flags? We’re running the new container in “detached” mode (in the background) and creating a mapping between the host’s port 3000 to the container’s port 3000. Without the port mapping, we wouldn’t be able to access the application.
 
+### why
+
+why to run a container with argument `-d`?
+
+run in the background.
+
+### open in terminal
+
+ execute an interactive `bash` shell on the container.
+
+```
+$ docker exec -it ubuntu_bash bash
+```
+
+This will create a new Bash session in the container `ubuntu_bash`.
+
+https://docs.docker.com/engine/reference/commandline/exec/
+
 ### stop & remove
 
 `docker stop <container-id>`
@@ -71,3 +89,26 @@ Volumes provide the ability to connect specific filesystem paths of the containe
 With bind mounts, we control the exact mountpoint on the host. We can use this to persist data, but it’s often used to provide additional data into containers. When working on an application, we can use a bind mount to mount our source code into the container to let it see code changes, respond, and let us see the changes right away.
 
 docker become into a running environment.
+
+### Use bind mounts
+
+use `-v` to declare the mounting target. `--mount` is more verbose.
+
+> It is always created as a directory.
+
+-v source:target to bind directory in host system.
+
+```shell
+ docker run -d \
+  -it \
+  --name devtest \
+  -v "$(pwd)"/target:/app \
+  nginx:latest
+```
+
+
+
+:question:after mounting the source files, i want to change the file in container. how to do that?
+
+use command `docker inspect <container name>  ` , find 'Mounts' properties, if the RW is true, it says writing in container is okay, or need to change writing permission of the source directory.
+
