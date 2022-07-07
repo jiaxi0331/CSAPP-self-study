@@ -5,8 +5,8 @@ container=$(docker ps -q -f name=csapp-lab)
 if [[ -z "$container" ]]; then
 docker run -d -it \
 	--name csapp-lab \
-	-v "$(pwd)"/labs:/home/csapp \
-	ubuntu 
+	-v "$(pwd)"/labs:/root/csapp \
+	csapp-linux 
 echo "waiting 3s to enter the terminal..."
 
 sleep 3
