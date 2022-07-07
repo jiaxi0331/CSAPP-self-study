@@ -1,8 +1,8 @@
-/* 
- * CS:APP Data Lab 
- * 
- * <Please put your name and userid here>
- * 
+/*
+ * CS:APP Data Lab
+ *
+ * <JiaXi Liu>
+ *
  * bits.c - Source file with your solutions to the Lab.
  *          This is the file you will hand in to your instructor.
  *
@@ -10,7 +10,7 @@
  * compiler. You can still use printf for debugging without including
  * <stdio.h>, although you might get a compiler warning. In general,
  * it's not good practice to ignore compiler warnings, but in this
- * case it's OK.  
+ * case it's OK.
  */
 
 #if 0
@@ -129,61 +129,71 @@ NOTES:
  *      the correct answers.
  */
 
-
 #endif
-//1
-/* 
- * bitXor - x^y using only ~ and & 
+// 1
+/*
+ * bitXor - x^y using only ~ and &
  *   Example: bitXor(4, 5) = 1
  *   Legal ops: ~ &
  *   Max ops: 14
  *   Rating: 1
  */
-int bitXor(int x, int y) {
-  return 2;
+int bitXor(int x, int y)
+{
+  return (~(x & y)) & (~(~x & ~y));
 }
-/* 
- * tmin - return minimum two's complement integer 
+/*
+ * tmin - return minimum two's complement integer
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 4
  *   Rating: 1
  */
-int tmin(void) {
-  return 2;
+int tmin(void)
+{
+  unsigned int a = 0;
+  a = ~(~a >> 1);
+  return a;
 }
-//2
+// 2
 /*
  * isTmax - returns 1 if x is the maximum, two's complement number,
- *     and 0 otherwise 
+ *     and 0 otherwise
  *   Legal ops: ! ~ & ^ | +
  *   Max ops: 10
  *   Rating: 2
  */
-int isTmax(int x) {
-  return 2;
+int isTmax(int x)
+{
+  return !(x + 1 + 1 + x) ^ (!(x + 1));
 }
-/* 
+/*
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
  *   Examples allOddBits(0xFFFFFFFD) = 0, allOddBits(0xAAAAAAAA) = 1
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 12
  *   Rating: 2
  */
-int allOddBits(int x) {
-  return 2;
+int allOddBits(int x)
+{
+  int a = 0xAAAAAAAA;
+  x = x & a;
+  x = x ^ a;
+  return !x;
 }
-/* 
- * negate - return -x 
+/*
+ * negate - return -x
  *   Example: negate(1) = -1.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 5
  *   Rating: 2
  */
-int negate(int x) {
-  return 2;
+int negate(int x)
+{
+  x = ~x;
+  return x + 1;
 }
-//3
-/* 
+// 3
+/*
  * isAsciiDigit - return 1 if 0x30 <= x <= 0x39 (ASCII codes for characters '0' to '9')
  *   Example: isAsciiDigit(0x35) = 1.
  *            isAsciiDigit(0x3a) = 0.
@@ -192,40 +202,74 @@ int negate(int x) {
  *   Max ops: 15
  *   Rating: 3
  */
-int isAsciiDigit(int x) {
-  return 2;
+int isAsciiDigit(int x)
+{
+  int benchmark = 0x80000000;
+  int rangeStart = 0x30;
+  int rangeEnd = 0x3a;
+  int r1 = x + ~rangeStart + 1;
+  r1 = !(r1 & benchmark);
+  int r2 = x + ~rangeEnd + 1;
+  r2 = !(r2 & benchmark);
+  return r1 ^ r2;
 }
-/* 
- * conditional - same as x ? y : z 
+/*
+ * conditional - same as x ? y : z
  *   Example: conditional(2,4,5) = 4
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 16
  *   Rating: 3
  */
-int conditional(int x, int y, int z) {
-  return 2;
+int conditional(int x, int y, int z)
+{
+  int c = !x; // c = 0 when x != 0; c =1 when x = 0
+  int minus_one = ~0;
+  c = c + minus_one; // c = 1111(-1) when x != 0;  c = 0 when x =0;
+  int r1 = c & y;    // r1 = y when x != 0; r1 = 0 when x = 0;
+  int r2 = ~c & z;   // r2 = 0 when x != 0; r2 = z when x = 0;
+  return r1 ^ r2;
 }
-/* 
- * isLessOrEqual - if x <= y  then return 1, else return 0 
+/*
+ * isLessOrEqual - if x <= y  then return 1, else return 0
  *   Example: isLessOrEqual(4,5) = 1.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 24
  *   Rating: 3
  */
-int isLessOrEqual(int x, int y) {
-  return 2;
+int isLessOrEqual(int x, int y)
+{
+  int sign_x = (x >> 31) & 1;
+  int sign_y = (y >> 31) & 1;
+  int same_sign = !(sign_x ^ sign_y);
+  // when not same_sign, result must be 1 if x < 0 else 0;
+  int r1 = sign_x; // 0001 when x < 0; 0000 when x >= 0;
+  int diff_x_y = x + ~y + 1;
+  int sign_diff_x_y = (diff_x_y >> 31) & 1;
+  int diff_less_than_0 = sign_diff_x_y; // if diff >= 0, return 0, else return 1 if diff < 0;
+  int diff_equal_0 = !(diff_x_y ^ 0);   // return 1 if equal 0, else return 0;
+  int r2 = diff_less_than_0 ^ diff_equal_0;
+  // conditional(same_sign, r2, r1)
+
+  int c = same_sign + ~0; // c = 1111 when same_sign is true else c = 0000 when not same sign
+  r1 = c & r1;
+  r2 = ~c & r2;
+  return r1 ^ r2;
 }
-//4
-/* 
- * logicalNeg - implement the ! operator, using all of 
+// 4
+/*
+ * logicalNeg - implement the ! operator, using all of
  *              the legal operators except !
  *   Examples: logicalNeg(3) = 0, logicalNeg(0) = 1
  *   Legal ops: ~ & ^ | + << >>
  *   Max ops: 12
- *   Rating: 4 
+ *   Rating: 4
  */
-int logicalNeg(int x) {
-  return 2;
+int logicalNeg(int x)
+{
+  int sign_x = (x >> 31) & 1;
+  int sign_negative_x = ((~x + 1) >> 31) & 1;
+  int r = (sign_x ^ sign_negative_x) | sign_x; // 除0之外，
+  return r ^ 1;
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -239,11 +283,12 @@ int logicalNeg(int x) {
  *  Max ops: 90
  *  Rating: 4
  */
-int howManyBits(int x) {
+int howManyBits(int x)
+{
   return 0;
 }
-//float
-/* 
+// float
+/*
  * float_twice - Return bit-level equivalent of expression 2*f for
  *   floating point argument f.
  *   Both the argument and result are passed as unsigned int's, but
@@ -254,10 +299,11 @@ int howManyBits(int x) {
  *   Max ops: 30
  *   Rating: 4
  */
-unsigned float_twice(unsigned uf) {
+unsigned float_twice(unsigned uf)
+{
   return 2;
 }
-/* 
+/*
  * float_i2f - Return bit-level equivalent of expression (float) x
  *   Result is returned as unsigned int, but
  *   it is to be interpreted as the bit-level representation of a
@@ -266,10 +312,11 @@ unsigned float_twice(unsigned uf) {
  *   Max ops: 30
  *   Rating: 4
  */
-unsigned float_i2f(int x) {
+unsigned float_i2f(int x)
+{
   return 2;
 }
-/* 
+/*
  * float_f2i - Return bit-level equivalent of expression (int) f
  *   for floating point argument f.
  *   Argument is passed as unsigned int, but
@@ -281,6 +328,7 @@ unsigned float_i2f(int x) {
  *   Max ops: 30
  *   Rating: 4
  */
-int float_f2i(unsigned uf) {
+int float_f2i(unsigned uf)
+{
   return 2;
 }
